@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Tile } from '../components/Tile';
 import { todayMessage } from '../content/encourage';
+import { setTileSettings, useTileSettings } from '../settings';
 import type { TileKind } from '../core/tile';
 import { href, type Route } from '../router';
 import { labelOf } from '../stats/labels';
@@ -10,7 +11,7 @@ import { weakList } from '../stats/weighting';
 const MODES: { route: Route; title: string; text: string; icon: TileKind }[] = [
   { route: 'wait', title: '待ち当てクイズ', text: 'テンパイした手の、和了れる牌をすべて当てる', icon: 13 },
   { route: 'yaku', title: '役クイズ', text: '和了った手についている役を当てる', icon: 33 },
-  { route: 'cards', title: '役の解説カード', text: '役ごとの条件・鳴いてOKか・よくある勘違い', icon: 31 },
+  { route: 'cards', title: '役の解説カード', text: '役ごとの条件・鳴いてOKか・よくある勘違い', icon: 18 },
   { route: 'canwin', title: 'その手、和了れる?', text: '役なし・片和了・フリテンを見抜く', icon: 32 },
   { route: 'solo', title: '一人打ち練習', text: '山から引いて捨てるを繰り返す', icon: 27 },
   { route: 'stats', title: '学習記録', text: '正答率と苦手な形・役', icon: 26 },
@@ -101,6 +102,44 @@ export function Home() {
           </li>
         ))}
       </ul>
+
+      <TileDesignSettings />
     </div>
+  );
+}
+
+const PREVIEW: { kind: TileKind; red?: boolean }[] = [
+  { kind: 0 },
+  { kind: 13, red: true },
+  { kind: 16 },
+  { kind: 18 },
+  { kind: 25 },
+  { kind: 27 },
+  { kind: 31 },
+  { kind: 33 },
+];
+
+/** 牌のデザインの設定(実物に近い/見やすさ重視) */
+function TileDesignSettings() {
+  const s = useTileSettings();
+  return (
+    <details className="panel tile-settings">
+      <summary>牌のデザイン</summary>
+      <div className="segmented" role="radiogroup" aria-label="牌のデザイン">
+        <label>
+          <input type="radio" name="tile-face" checked={s.face === 'real'} onChange={() => setTileSettings({ face: 'real' })} />
+          <span>実物に近い</span>
+        </label>
+        <label>
+          <input type="radio" name="tile-face" checked={s.face === 'simple'} onChange={() => setTileSettings({ face: 'simple' })} />
+          <span>見やすさ重視</span>
+        </label>
+      </div>
+      <div className="tile-preview" aria-label="見本">
+        {PREVIEW.map((p, i) => (
+          <Tile key={i} kind={p.kind} red={p.red} />
+        ))}
+      </div>
+    </details>
   );
 }

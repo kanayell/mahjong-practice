@@ -1,7 +1,10 @@
-// 見やすい牌(SVG)
-// 萬子=赤、筒子=青、索子=緑。色が見分けにくい人のため、下の帯の模様も種類ごとに変えている
-// (萬子=べた塗り、筒子=丸、索子=縦じま)。
+// 牌(SVG)。デザインは設定で切り替えられる
+//  ・real(初期値):実物に近いデザイン(RealTileFace.tsx)
+//  ・simple:見やすさ重視。萬子=赤、筒子=青、索子=緑の漢数字。色が見分けにくい人のため、
+//    下の帯の模様も種類ごとに変えている(萬子=べた塗り、筒子=丸、索子=縦じま)。
 import { numberOf, suitOf, tileName, type TileKind } from '../core/tile';
+import { useTileSettings } from '../settings';
+import { RealTileFace } from './RealTileFace';
 
 const KANJI_NUM = ['一', '二', '三', '四', '五', '六', '七', '八', '九'];
 const SUIT_CHAR = { m: '萬', p: '筒', s: '索' } as const;
@@ -33,7 +36,8 @@ export function Tile({ kind, red, selected, mark, dim, sideways, onClick, classN
     .filter(Boolean)
     .join(' ');
   const label = `${tileName(kind)}${red ? '(赤)' : ''}`;
-  const face = <TileFace kind={kind} red={red} />;
+  const settings = useTileSettings();
+  const face = settings.face === 'real' ? <RealTileFace kind={kind} red={red} /> : <TileFace kind={kind} red={red} />;
   if (onClick) {
     return (
       <button type="button" className={cls} onClick={onClick} aria-label={label} aria-pressed={selected}>
