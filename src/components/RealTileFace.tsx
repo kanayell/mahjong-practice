@@ -1,8 +1,9 @@
-// 実物に近いデザインの牌(SVG)
+// 実物に近いデザインの牌(SVG)。色は実物と同じく赤・黒・緑の3色だけを使い、
+// 1枚の牌に使う色は2色まで(1色の牌は1色)にする
 // ・萬子:黒い漢数字+赤い「萬」
-// ・筒子:丸を実物と同じ並べ方で描く
-// ・索子:竹の棒を実物と同じ並べ方で描く(一索は鳥)
-// ・字牌:東南西北は黒、白は青い枠、發は緑、中は赤
+// ・筒子:丸を実物と同じ並べ方で描く(緑と赤が中心。八筒だけ黒)
+// ・索子:竹の棒を実物と同じ並べ方で描く(緑と赤。一索の鳥は緑1色)
+// ・字牌:東南西北は黒、白は黒の二重枠、發は緑、中は赤
 // ・赤ドラ:実物と同じく、5の牌全体を赤くする
 import { numberOf, suitOf, type TileKind } from '../core/tile';
 
@@ -13,10 +14,9 @@ const FONT = "'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif";
 const INK = '#1d1d1d';
 const RED = '#c8202f';
 const GREEN = '#127a3e';
-const BLUE = '#1b4fa3';
 
-type C = 'r' | 'g' | 'b';
-const COL: Record<C, string> = { r: RED, g: GREEN, b: BLUE };
+type C = 'r' | 'g' | 'k';
+const COL: Record<C, string> = { r: RED, g: GREEN, k: INK };
 
 export function RealTileFace({ kind, red }: { kind: TileKind; red?: boolean }) {
   const suit = suitOf(kind);
@@ -67,12 +67,15 @@ function Circle({ x, y, r, c }: { x: number; y: number; r: number; c: string }) 
   );
 }
 
-/** 筒子の並べ方:[x, y, 色] */
+/**
+ * 筒子の並べ方:[x, y, 色]
+ * 実物と同じく、1枚に使う色は2色まで(二筒・四筒は緑だけ、八筒は黒だけ)。
+ */
 const PIN: Record<number, { r: number; dots: [number, number, C][] }> = {
-  2: { r: 10, dots: [[30, 23, 'g'], [30, 53, 'b']] },
-  3: { r: 8, dots: [[18, 22, 'b'], [30, 39, 'r'], [42, 56, 'g']] },
-  4: { r: 9.5, dots: [[19, 25, 'b'], [41, 25, 'g'], [19, 51, 'g'], [41, 51, 'b']] },
-  5: { r: 7.8, dots: [[18, 22, 'b'], [42, 22, 'g'], [30, 39, 'r'], [18, 56, 'g'], [42, 56, 'b']] },
+  2: { r: 10, dots: [[30, 23, 'g'], [30, 53, 'g']] },
+  3: { r: 8, dots: [[18, 22, 'g'], [30, 39, 'r'], [42, 56, 'g']] },
+  4: { r: 9.5, dots: [[19, 25, 'g'], [41, 25, 'g'], [19, 51, 'g'], [41, 51, 'g']] },
+  5: { r: 7.8, dots: [[18, 22, 'g'], [42, 22, 'g'], [30, 39, 'r'], [18, 56, 'g'], [42, 56, 'g']] },
   6: { r: 8, dots: [[19, 19, 'g'], [41, 19, 'g'], [19, 39, 'r'], [41, 39, 'r'], [19, 59, 'r'], [41, 59, 'r']] },
   7: {
     r: 6.4,
@@ -80,28 +83,28 @@ const PIN: Record<number, { r: number; dots: [number, number, C][] }> = {
   },
   8: {
     r: 7,
-    dots: [[19, 14, 'b'], [41, 14, 'b'], [19, 30, 'b'], [41, 30, 'b'], [19, 46, 'b'], [41, 46, 'b'], [19, 62, 'b'], [41, 62, 'b']],
+    dots: [[19, 14, 'k'], [41, 14, 'k'], [19, 30, 'k'], [41, 30, 'k'], [19, 46, 'k'], [41, 46, 'k'], [19, 62, 'k'], [41, 62, 'k']],
   },
   9: {
     r: 6.6,
-    dots: [[16, 20, 'b'], [30, 20, 'b'], [44, 20, 'b'], [16, 39, 'r'], [30, 39, 'r'], [44, 39, 'r'], [16, 58, 'g'], [30, 58, 'g'], [44, 58, 'g']],
+    dots: [[16, 20, 'g'], [30, 20, 'g'], [44, 20, 'g'], [16, 39, 'r'], [30, 39, 'r'], [44, 39, 'r'], [16, 58, 'g'], [30, 58, 'g'], [44, 58, 'g']],
   },
 };
 
 function Pinzu({ n, red }: { n: number; red?: boolean }) {
   if (n === 1) {
-    // 一筒:大きな飾りの丸
+    // 一筒:緑の大きな飾りの丸と、赤い中心(緑・赤の2色)
     return (
       <g>
         <circle cx="30" cy="38" r="20" fill={GREEN} />
         <circle cx="30" cy="38" r="17" fill="#fffdf6" />
         {Array.from({ length: 12 }, (_, i) => {
           const a = (i * Math.PI) / 6;
-          return <circle key={i} cx={30 + Math.cos(a) * 14} cy={38 + Math.sin(a) * 14} r="2.2" fill={BLUE} />;
+          return <circle key={i} cx={30 + Math.cos(a) * 14} cy={38 + Math.sin(a) * 14} r="2.2" fill={GREEN} />;
         })}
-        <circle cx="30" cy="38" r="9.5" fill={RED} />
-        <circle cx="30" cy="38" r="6" fill="#fffdf6" />
-        <circle cx="30" cy="38" r="3.2" fill={RED} />
+        <circle cx="30" cy="38" r="9.5" fill={GREEN} />
+        <circle cx="30" cy="38" r="6.5" fill="#fffdf6" />
+        <circle cx="30" cy="38" r="3.6" fill={RED} />
       </g>
     );
   }
@@ -175,26 +178,26 @@ function Souzu({ n, red }: { n: number; red?: boolean }) {
   );
 }
 
-/** 一索の鳥 */
+/** 一索の鳥(実物と同じく緑1色。羽の境目は牌の地の色の線で表す) */
 function Bird() {
+  const IVORY = '#fffdf6';
   return (
     <g>
       {/* 尾羽 */}
       <path d="M22 50 Q8 56 10 70 Q16 60 24 56 Z" fill={GREEN} />
-      <path d="M24 54 Q16 66 22 74 Q24 64 29 57 Z" fill={BLUE} />
+      <path d="M24 54 Q16 66 22 74 Q24 64 29 57 Z" fill={GREEN} stroke={IVORY} strokeWidth="1" />
       {/* 体 */}
       <ellipse cx="31" cy="46" rx="12" ry="10" fill={GREEN} />
-      <path d="M24 44 Q31 36 40 44 Q32 50 24 44 Z" fill={BLUE} />
+      <path d="M24 44 Q31 37 39 43 M26 48 Q32 43 38 47" fill="none" stroke={IVORY} strokeWidth="1.2" strokeLinecap="round" />
       {/* 首と頭 */}
       <path d="M36 40 Q40 30 37 22 L44 22 Q46 32 41 42 Z" fill={GREEN} />
       <circle cx="40" cy="20" r="6" fill={GREEN} />
-      <circle cx="41.5" cy="19" r="1.6" fill="#fffdf6" />
-      <circle cx="41.8" cy="19" r="0.8" fill={INK} />
+      <circle cx="41.5" cy="19" r="1.4" fill={IVORY} />
       {/* くちばしととさか */}
-      <path d="M45.5 19 L52 21.5 L45.5 23 Z" fill={RED} />
-      <path d="M35 15 Q37 8 40 13 Q42 7 44 14 Z" fill={RED} />
+      <path d="M45.5 19 L52 21.5 L45.5 23 Z" fill={GREEN} />
+      <path d="M35 15 Q37 8 40 13 Q42 7 44 14 Z" fill={GREEN} />
       {/* 足 */}
-      <path d="M29 55 L27 63 M33 55 L35 63" stroke={RED} strokeWidth="2" strokeLinecap="round" />
+      <path d="M29 55 L27 63 M33 55 L35 63" stroke={GREEN} strokeWidth="2" strokeLinecap="round" />
     </g>
   );
 }
@@ -202,7 +205,13 @@ function Bird() {
 function Honor({ i }: { i: number }) {
   const ch = HONOR[i];
   if (ch === '白') {
-    return <rect x="14" y="18" width="32" height="44" rx="3" fill="none" stroke="#4a73c4" strokeWidth="3" />;
+    // 白:黒の二重枠
+    return (
+      <g fill="none" stroke={INK}>
+        <rect x="13" y="17" width="34" height="46" rx="3" strokeWidth="2.6" />
+        <rect x="17.5" y="21.5" width="25" height="37" rx="1.5" strokeWidth="1.2" />
+      </g>
+    );
   }
   const color = ch === '發' ? GREEN : ch === '中' ? RED : INK;
   return (
