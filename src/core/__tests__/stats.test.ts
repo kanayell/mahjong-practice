@@ -1,5 +1,5 @@
 import { createRng } from '../random';
-import { addResult, emptyStats, loadStats, recordResult, resetStats, saveStats, STATS_KEY, type KeyValueStore } from '../../stats/storage';
+import { addResult, emptyStats, loadStats, recordResult, resetStats, saveStats, STATS_KEY, streakDays, type KeyValueStore } from '../../stats/storage';
 import { errorRate, pickWeak, weakList } from '../../stats/weighting';
 
 function memStore(): KeyValueStore & { data: Map<string, string> } {
@@ -26,6 +26,16 @@ describe('学習記録', () => {
     d = addResult(d, 'canwin', true, [], day2);
     expect(d.days['2026-11-07']).toEqual({ correct: 1, total: 1 });
     expect(d.days['2026-11-08']).toEqual({ correct: 1, total: 2 });
+  });
+
+  it('連続練習日数を数える(今日まだでも昨日まで続いていれば途切れない)', () => {
+    const at = (d: number) => new Date(2026, 10, d, 12).getTime();
+    let d = emptyStats();
+    for (const day of [3, 5, 6, 7]) d = addResult(d, 'wait', true, [], at(day));
+    expect(streakDays(d.days, at(7))).toBe(3);
+    expect(streakDays(d.days, at(8))).toBe(3);
+    expect(streakDays(d.days, at(9))).toBe(0);
+    expect(streakDays(emptyStats().days, at(7))).toBe(0);
   });
 
   it('壊れたデータや古い形式は無視して、空の記録から始める', () => {

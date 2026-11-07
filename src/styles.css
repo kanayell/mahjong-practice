@@ -76,6 +76,169 @@ a {
 }
 
 /* ---------- ホーム ---------- */
+
+/* 卓(緑のマット)の上に牌が並ぶ見出し */
+.hero {
+  container-type: inline-size;
+  position: relative;
+  margin-bottom: 14px;
+  padding: 22px 16px 14px;
+  border-radius: 18px;
+  color: #f4fbf8;
+  text-align: center;
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(255, 255, 255, 0.14), transparent 60%),
+    radial-gradient(circle at 20% 80%, rgba(0, 0, 0, 0.12), transparent 50%),
+    #0f6e5c;
+  box-shadow: inset 0 0 0 3px rgba(0, 0, 0, 0.12), 0 4px 14px rgba(15, 110, 92, 0.25);
+}
+
+.hero-tiles {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 4px;
+  height: calc(clamp(44px, 13cqw, 62px) * 4 / 3 + 14px);
+}
+
+.hero-tile {
+  --tw: clamp(44px, 13cqw, 62px);
+  --rot: calc((var(--i) - 2) * 5deg);
+  display: inline-block;
+  transform: rotate(var(--rot));
+  transform-origin: 50% 120%;
+  filter: drop-shadow(0 4px 3px rgba(0, 0, 0, 0.3));
+  animation: deal 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+  animation-delay: calc(var(--i) * 80ms);
+}
+
+.hero-tile:nth-child(1),
+.hero-tile:nth-child(5) {
+  margin-bottom: -8px;
+}
+
+.hero-tile:nth-child(2),
+.hero-tile:nth-child(4) {
+  margin-bottom: -2px;
+}
+
+.hero-tile .tile {
+  --tw: inherit;
+  transition: transform 0.15s;
+}
+
+.hero-tile .tile:hover {
+  transform: translateY(-6px);
+}
+
+.hero-tile.is-flipped {
+  animation: flip 0.35s ease-out;
+}
+
+/* 透明から始めると、アニメーションが止まる環境で牌が見えなくなるため、位置だけを動かす */
+@keyframes deal {
+  from {
+    transform: translateY(-28px) rotate(0deg);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(var(--rot));
+  }
+}
+
+@keyframes flip {
+  from {
+    transform: rotate(var(--rot)) rotateY(90deg);
+  }
+  to {
+    transform: rotate(var(--rot)) rotateY(0deg);
+  }
+}
+
+.hero-catch {
+  margin: 16px 0 2px;
+  font-weight: 800;
+  font-size: clamp(1.25rem, 5.6cqw, 1.6rem);
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+}
+
+.hero-lead {
+  margin: 0 0 6px;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  opacity: 0.92;
+}
+
+.today-text {
+  display: block;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.hero-hint {
+  margin: 0;
+  font-size: 0.75rem;
+  opacity: 0.75;
+}
+
+/* 今日の練習 */
+.today-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px 12px;
+  margin-bottom: 14px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+}
+
+.today-label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.today-num {
+  font-size: 1.2rem;
+}
+
+.streak {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--select) 16%, var(--panel));
+  border: 2px solid var(--select);
+  line-height: 1.1;
+}
+
+.streak-num {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--select);
+}
+
+.streak-unit {
+  font-size: 0.65rem;
+  color: var(--muted);
+}
+
+.today-weak {
+  grid-column: 1 / -1;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border);
+}
+
+.today-weak span:last-child {
+  font-weight: 700;
+  color: var(--ng);
+}
+
+/* モードの一覧 */
 .mode-list {
   list-style: none;
   padding: 0;
@@ -84,23 +247,58 @@ a {
   gap: 10px;
 }
 
+@media (min-width: 640px) {
+  .mode-list {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
 .mode-card {
   display: flex;
-  flex-direction: column;
-  padding: 14px 16px;
-  border-radius: 12px;
+  align-items: center;
+  gap: 14px;
+  height: 100%;
+  padding: 12px 14px;
+  border-radius: 14px;
   background: var(--panel);
   border: 1px solid var(--border);
   text-decoration: none;
   color: var(--text);
+  transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
 }
 
-a.mode-card:hover {
+a.mode-card:hover,
+a.mode-card:focus-visible {
   border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
 }
 
-.mode-card.is-disabled {
-  opacity: 0.55;
+.mode-icon {
+  flex: none;
+  display: inline-block;
+  transform: rotate(-6deg);
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
+  transition: transform 0.2s;
+}
+
+.mode-icon .tile {
+  --tw: 36px;
+}
+
+.mode-list li:nth-child(even) .mode-icon {
+  transform: rotate(5deg);
+}
+
+a.mode-card:hover .mode-icon {
+  transform: rotate(0deg) translateY(-3px) scale(1.06);
+}
+
+.mode-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .mode-title {
@@ -110,16 +308,44 @@ a.mode-card:hover {
 
 .mode-text {
   color: var(--muted);
-  font-size: 0.9rem;
+  font-size: 0.88rem;
 }
 
-.badge {
-  font-size: 0.7rem;
+.mode-arrow {
+  flex: none;
+  font-size: 1.6rem;
+  color: var(--muted);
+  transition: transform 0.15s, color 0.15s;
+}
+
+a.mode-card:hover .mode-arrow {
+  color: var(--accent);
+  transform: translateX(3px);
+}
+
+.badge-start {
+  display: inline-block;
   margin-left: 8px;
-  padding: 1px 6px;
-  border-radius: 4px;
-  background: var(--border);
-  font-weight: 400;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--select);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  vertical-align: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-tile,
+  .hero-tile.is-flipped {
+    animation: none;
+  }
+  .mode-card,
+  .mode-icon,
+  .mode-arrow,
+  .hero-tile .tile {
+    transition: none;
+  }
 }
 
 /* ---------- 牌 ---------- */
@@ -970,26 +1196,6 @@ ruby.term rt {
 }
 
 /* ---------- 学習記録 ---------- */
-.today {
-  display: grid;
-  gap: 6px;
-}
-
-.today-label {
-  display: block;
-  font-size: 0.8rem;
-  color: var(--muted);
-}
-
-.today-num {
-  font-size: 1.2rem;
-}
-
-.today-weak span:last-child {
-  font-weight: 700;
-  color: var(--ng);
-}
-
 .switch-row {
   display: flex;
   gap: 10px;

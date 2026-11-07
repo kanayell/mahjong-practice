@@ -96,6 +96,22 @@ export function dayKey(now: number): string {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 }
 
+/**
+ * 何日続けて練習しているか。
+ * 今日まだ練習していなくても、昨日まで続いていれば途切れていないと数える。
+ */
+export function streakDays(days: StatsData['days'], now = Date.now()): number {
+  const has = (t: number) => (days[dayKey(t)]?.total ?? 0) > 0;
+  const DAY = 24 * 60 * 60 * 1000;
+  let t = has(now) ? now : now - DAY;
+  let n = 0;
+  while (has(t)) {
+    n++;
+    t -= DAY;
+  }
+  return n;
+}
+
 export interface Detail {
   key: string;
   correct: boolean;
